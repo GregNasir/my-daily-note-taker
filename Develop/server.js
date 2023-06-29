@@ -1,99 +1,61 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-// Helper method for generating unique ids
-const uuid = require('uuid');
-
-const PORT = 3001;
+const util = require('util');
+const uniqid = require('uniqid');
+const PORT = process.env.PORT || 3001;
+const noteData = require('./db/db.json')
+// const { allowedNodeEnvironmentFlags } = require('process');
 
 const app = express();
+
+//const getAndRenderNotes = require('./public/assets/js/index')
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(express.static('./develop/public'));
-
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '/public/index.html'));
-
-   // Log our request to the terminal
-    console.info(`${req.method} request received to get notes`);
-});
-
-// GET /notes should return the notes.html file.
-app.get('/notes', (req, res) => {
-  res.sendFile(path.join(__dirname, '/public/notes.html'));
-
-  // Log our request to the terminal
-  console.info(`${req.method} request received to get notes`);
-});
-
-// // GET request for notes
-// app.get('/api/notes', (req, res) => {
-//   // Send a message to the client
-//   res.sendFile(path.join(__dirname, '../db/db.json'));
-
-//   // Log our request to the terminal
-//   console.info(`${req.method} request received to get notes`);
-// });
+app.use(express.static('public'));
 
 
-// POST request to add a review
-app.post('/api/notes', (req, res) => {
-    let db = fs.readFileSync('db/db.json');
-    db = JSON.parse(db);
-    res.json(db);
+//app.get('/', (req, res) => res.send('Navigate to the public folder'))
 
-    // If all the required properties are present
-    if (title && text) {    
-    // creating body for note
-    let userNote = {
-      title: req.body.title,
-      text: req.body.text,
-      // creating unique id for each note
-      id: uniqid(),
-    };
-
-    // pushing created note to be written in the db.json file
-    db.push(userNote);
-
-    fs.writeFileSync('db/db.json', JSON.stringify(db), (err) => 
-    err
-    ? console.error(err)
-    : console.log(
-        `Notes for ${notes.html} has been written to JSON file`
-        )
-    );
-
-    res.json(db);
-
-    const response = {
-        status: 'success',
-        body: userNote,
-    };
-
-    console.log(response);
-    res.status(201).json(response);
-    } else {
-      res.status(500).json('Error in posting notes');
-    }
-});
-
-
-app.listen(PORT, () =>
-  console.log(`App listening at http://localhost:${PORT} 🚀`)
+app.get('/notes', (req, res) => 
+    res.sendFile(path.join(__dirname, 'public/notes.html'))
 );
 
-// DELETE /api/notes/:id should receive a query parameter containing the id of a note to delete.
-app.delete('/api/notes/:id', (req, res) => {
-    // reading notes form db.json
-    let db = JSON.parse(fs.readFileSync('db/db.json'))
-    // removing note with id
-    let deleteNotes = db.filter(item => item.id !== req.params.id);
-    // Rewriting note to db.json
-    fs.writeFileSync('db/db.json', JSON.stringify(deleteNotes));
-    res.json(deleteNotes);
-    
-  });
+app.get('/api/notes', (req, res) => {
+    //res.readFile(path.join(__dirname, 'db/db.json'))
+    //res.json(noteData);
+    //console.log(noteData);
+    res.json(noteData);
+});
 
-module.exports = (app);
+
+
+app.post('/api/notes', (req, res) => {
+    console.log('in the post route');
+            console.log('in the else of ReadandAppend');
+            var newNote = req.body;
+            console.log('this is before the id', newNote);
+            newNote.id = uniqid();
+            console.log('this is after the id is added', newNote);
+            noteData.push(newNote);
+            fs.writeFile('./db/db.json', JSON.stringify(noteData, null, 4) , (err) => {
+            err ? console.log(err) : res.send(newNote)
+        })
+});
+
+app.delete('api/notes/:id', (req, res) => {
+    const id = req.params.id;
+    res.unlink(id, './db/db.json')
+    res.readFile(id, './db/db.json')
+});
+
+
+app.get('*', (req, res) =>
+    res.sendFile(path.join(__dirname, 'public/index.html'))
+);
+
+app.listen(PORT, () => {
+    console.log(`Example app listening at http://localHost:${PORT}`);
+});
