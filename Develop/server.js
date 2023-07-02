@@ -1,19 +1,18 @@
 const fs = require('fs')
 const path = require('path')
 const express = require('express')
-
-const PORT = process.env.PORT || 3001;
+const app = express()
+const PORT = process.env.PORT || 3001
 const db = require('./db/db.json')
 
 //Allows all notes to have a unique ID
 const { v4: uuidv4 } = require('uuid');
 
 //Allows public folder to be unblocked
-app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'))
-app.use(express.json())
 
-const app = express()
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json())
 
 //API Routes
 // GET /api/notes should read the db.json file and return all saved notes as JSON.
@@ -50,15 +49,18 @@ app.post('/api/notes', (req, res) => {
 //DELETE
 // notes when the button is clicked by removing the note from db.json, saving and showing the updated database on the front end.
 app.delete('/api/notes/:id', (req, res) => {
-    const newDb = db.filter((note) =>
-        note.id !== req.params.id)
+    const newDb = db.filter((note) => note.id !== req.params.id);
 
-    // update the db.json file to reflect the modified notes array
-    fs.writeFileSync('./db/db.json', JSON.stringify(newDb))
+    if (newDb === null) {
+        return [];
+    } else {
+        // update the data source (e.g., a JSON file) to reflect the modified notes array
+        fs.writeFileSync('./db/db.json', JSON.stringify(newDb));
 
-    // send that removed note object back to user
-    readFile.json(newDb)
-})
+        // respond to the client with the updated data
+        res.json(newDb);
+    }
+});
 
 //HTML Routes
 //Home
