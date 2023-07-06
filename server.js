@@ -8,11 +8,12 @@ const db = require('./db/db.json')
 //Allows all notes to have a unique ID
 const { v4: uuidv4 } = require('uuid');
 
+app.use(express.json())
+
 //Allows public folder to be unblocked
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'))
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json())
 
 //API Routes
 // GET /api/notes should read the db.json file and return all saved notes as JSON.
