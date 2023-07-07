@@ -29,7 +29,8 @@ Building the note taker app, provided me with intimate knowledge of using the Ex
   
 * <a href="https://notetakerzzz-f979f98b76f3.herokuapp.com/">notetakerzzz app</a>
 
-* <img width="1386" alt="Note-taker-screenshot" src="./assets/images/note-taker-screen-shot.png">
+<img width="723" alt="note-taker-screen-shot" src="https://github.com/GregNasir/my-daily-note-taker/assets/63434657/718d3849-acf4-4ca3-8704-2bc91544ee12">
+
 
 ## Installation
 
