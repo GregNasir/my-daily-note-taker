@@ -52,16 +52,14 @@ app.post('/api/notes', (req, res) => {
 app.delete('/api/notes/:id', (req, res) => {
     const newDb = db.filter((note) => note.id !== req.params.id);
 
-    if (newDb === null) {
-        return [];
-    } else {
+    
         // update the data source (e.g., a JSON file) to reflect the modified notes array
         fs.writeFileSync('./db/db.json', JSON.stringify(newDb));
 
         // respond to the client with the updated data
         res.json(newDb);
     }
-});
+);
 
 //HTML Routes
 //Home
